@@ -1,6 +1,6 @@
 # Todo API Documentation
 
-**Base URL:** `http://your-domain.com/api`
+**Base URL:** `https://api.abchnexus.com/api`
 
 ---
 
