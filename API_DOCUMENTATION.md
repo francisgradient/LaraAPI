@@ -6,7 +6,7 @@
 
 ## Authentication
 
-All endpoints (except `/hello`) require authentication via **Laravel Sanctum**.
+All endpoints (except `/hello`, `/login`, and `/register`) require authentication via **Laravel Sanctum**.
 
 Include the token in the `Authorization` header:
 
@@ -43,7 +43,134 @@ Health check endpoint.
 
 ### Auth
 
-#### `GET /user`
+#### 1. Register
+
+`POST /register`
+
+Create a new user account and receive an API token.
+
+**Request Body:**
+
+| Field                   | Type   | Required | Rules                        |
+|-------------------------|--------|----------|------------------------------|
+| `name`                  | string | Yes      | max 255 chars                |
+| `email`                 | string | Yes      | valid email, unique, max 255 |
+| `password`              | string | Yes      | min 8 chars (default rules)  |
+| `password_confirmation` | string | Yes      | must match `password`        |
+
+**Example Request:**
+
+```json
+{
+  "name": "John Doe",
+  "email": "john@example.com",
+  "password": "password123",
+  "password_confirmation": "password123"
+}
+```
+
+**Response** `201 Created`
+
+```json
+{
+  "user": {
+    "id": 1,
+    "name": "John Doe",
+    "email": "john@example.com",
+    "updated_at": "2026-03-04T10:00:00.000000Z",
+    "created_at": "2026-03-04T10:00:00.000000Z"
+  },
+  "token": "1|abc123def456..."
+}
+```
+
+**Response** `422 Unprocessable Entity` (validation error)
+
+```json
+{
+  "message": "The email has already been taken.",
+  "errors": {
+    "email": ["The email has already been taken."]
+  }
+}
+```
+
+---
+
+#### 2. Login
+
+`POST /login`
+
+Authenticate and receive an API token.
+
+**Request Body:**
+
+| Field      | Type   | Required | Rules       |
+|------------|--------|----------|-------------|
+| `email`    | string | Yes      | valid email |
+| `password` | string | Yes      |             |
+
+**Example Request:**
+
+```json
+{
+  "email": "john@example.com",
+  "password": "password123"
+}
+```
+
+**Response** `200 OK`
+
+```json
+{
+  "user": {
+    "id": 1,
+    "name": "John Doe",
+    "email": "john@example.com",
+    "email_verified_at": "2026-03-04T10:00:00.000000Z",
+    "created_at": "2026-03-04T10:00:00.000000Z",
+    "updated_at": "2026-03-04T10:00:00.000000Z"
+  },
+  "token": "2|xyz789ghi012..."
+}
+```
+
+**Response** `422 Unprocessable Entity` (invalid credentials)
+
+```json
+{
+  "message": "The provided credentials are incorrect.",
+  "errors": {
+    "email": ["The provided credentials are incorrect."]
+  }
+}
+```
+
+---
+
+#### 3. Logout
+
+`POST /logout`
+
+Revoke the current API token. Requires authentication.
+
+**Headers:** `Authorization: Bearer {token}`
+
+**Response** `200 OK`
+
+```json
+{
+  "message": "Logged out successfully"
+}
+```
+
+**Response** `401 Unauthenticated` — if token is missing or invalid.
+
+---
+
+#### 4. Get Current User
+
+`GET /user`
 
 Returns the authenticated user's details.
 
