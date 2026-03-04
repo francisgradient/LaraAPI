@@ -10,7 +10,7 @@ Route::get('/user', function (Request $request) {
 
 Route::get('/hello', function () {
     return response()->json([
-        'message' => 'Hello World'
+        'message' => 'This is a message from Andromeda Galaxy! Destroy Earth in 7 Days.'
     ]);
 });
 
